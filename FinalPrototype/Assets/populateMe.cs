@@ -9,6 +9,13 @@ public class populateMe : MonoBehaviour
     public GameObject obstacle;
     public GameObject enemy;
 
+    private bool enemies = false;
+    private bool obstacles = false;
+
+    private bool prevObstacle = false;
+    private GameObject prevEnemy;
+    private int enemyCount = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,27 +44,78 @@ public class populateMe : MonoBehaviour
       for(int i = 1; i < 26; i++)
       {
         locations.Add(i);
-        Debug.Log(locations[i-1]);
       }
 
       int count = 1;
       // var objectTransform = cubeTest.GetComponent<Transform>();
-      foreach(Vector2 x in grid)
+      while(!enemies || !obstacles)
       {
-        GameObject instantObj = gatherAssets(count);
+        int currRan = Random.Range(0, locations.Count);
+        while(currRan > 20 || !locations.Contains(currRan))
+        {
+          currRan = Random.Range(0, locations.Count);
+        }
+        GameObject instantObj = gatherAssets();
 
-        Instantiate(instantObj, new Vector3(x.x, 0, x.y), Quaternion.identity, gameObject.GetComponent<Transform>());
+        if(count == 7)
+        {
+          enemies = true;
+          obstacles = true;
+        }
         count = count + 1;
+        Vector2 index = convertToCoord(currRan);
+
+        prevObstacle = (instantObj == obstacle);
+        if(instantObj == enemy)
+        {
+          prevEnemy = instantObj;
+        }
+
+        locations.Remove(currRan);
+        Vector2 positionsNew = grid[(int)index.x, (int)index.y];
+        Instantiate(instantObj, new Vector3(positionsNew.x, 0, positionsNew.y), Quaternion.identity, gameObject.GetComponent<Transform>());
+        Debug.Log(instantObj);
       }
     }
 
-    private GameObject gatherAssets(int count)
+    private Vector2 convertToCoord(int toConv)
     {
-      if(count % 2 == 0)
+      float row = Mathf.Floor(toConv / 5);
+      float column = toConv - (row * 5);
+
+      return new Vector2((int)row, (int)column);
+    }
+
+    private GameObject gatherAssets()
+    {
+      float prob = 100.0f;
+
+      if(prevObstacle == true)
       {
-        return obstacle;
+        prob = prob * Random.Range(0.90f, 0.95f);
       }
-      return enemy;
+      if(prevEnemy == enemy)
+      {
+        prob = prob * Random.Range(0.00f, 0.30f);
+      }
+      prob = prob - (enemyCount/10);
+      if(prob < 0.0f)
+      {
+        prob = 0.0f;
+      }
+
+      Debug.Log(prob);
+      bool finalChoice = (prob > Random.Range(-1, 100.0f));
+
+      prevEnemy = null;
+      prevObstacle = false;
+
+      if(!finalChoice)
+      {
+        enemyCount = enemyCount + 1;
+        return enemy;
+      }
+      return obstacle;
     }
 
     private Vector2[,] generateGrid(float x, float y, float floorZ)
@@ -80,10 +138,8 @@ public class populateMe : MonoBehaviour
           toRet[i,z] = new Vector2(tempX, currY);
           tempX += stepX;
         }
-
         currY -= stepY;
       }
-
       return toRet;
     }
 
