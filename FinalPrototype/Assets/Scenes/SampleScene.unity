@@ -395,7 +395,7 @@ MonoBehaviour:
   levelLayout: {fileID: 1297930277}
   obstacle: {fileID: 895356860}
   enemy: {fileID: 1244042831}
-  gridSectionsPerRow: 15
+  gridSectionsPerRow: 25
 --- !u!4 &463600058
 Transform:
   m_ObjectHideFlags: 0
