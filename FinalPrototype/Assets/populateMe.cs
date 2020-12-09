@@ -16,9 +16,17 @@ public class populateMe : MonoBehaviour
     private GameObject prevEnemy;
     private int enemyCount = 0;
 
+    [SerializeField]
+    [Range(5, 25)]
+    public int gridSectionsPerRow;
+
+    private int currGridSize = 0;
+
     // Start is called before the first frame update
     void Start()
     {
+      currGridSize = gridSectionsPerRow * gridSectionsPerRow;
+
       Component[] features;
       features = levelLayout.GetComponentsInChildren<Transform>();
 
@@ -37,11 +45,20 @@ public class populateMe : MonoBehaviour
 
       Transform floorSize = wallLocations[0];
 
+      Transform obstacleTransform = obstacle.GetComponent<Transform>();
+
+      var newScale = obstacleTransform.localScale;
+
+      newScale.x = ((floorSize.localScale.x * 10)/gridSectionsPerRow);
+      newScale.z = ((floorSize.localScale.z * 10)/gridSectionsPerRow);
+
+      obstacleTransform.localScale = newScale;
+
       Vector2[,] grid = generateGrid(floorSize.localScale.x * 10, floorSize.localScale.z * 10, relativeLevelPos);
 
       List<int> locations = new List<int>();
 
-      for(int i = 1; i < 26; i++)
+      for(int i = 1; i < currGridSize + 1; i++)
       {
         locations.Add(i);
       }
@@ -51,13 +68,13 @@ public class populateMe : MonoBehaviour
       while(!enemies || !obstacles)
       {
         int currRan = Random.Range(0, locations.Count);
-        while(currRan > 20 || !locations.Contains(currRan))
+        while(currRan > currGridSize - gridSectionsPerRow || !locations.Contains(currRan))
         {
           currRan = Random.Range(0, locations.Count);
         }
         GameObject instantObj = gatherAssets();
 
-        if(count == 7)
+        if(count == Mathf.Floor(currGridSize * 0.25f))
         {
           enemies = true;
           obstacles = true;
@@ -80,8 +97,8 @@ public class populateMe : MonoBehaviour
 
     private Vector2 convertToCoord(int toConv)
     {
-      float row = Mathf.Floor(toConv / 5);
-      float column = toConv - (row * 5);
+      float row = Mathf.Floor(toConv / gridSectionsPerRow);
+      float column = toConv - (row * gridSectionsPerRow);
 
       return new Vector2((int)row, (int)column);
     }
@@ -98,7 +115,8 @@ public class populateMe : MonoBehaviour
       {
         prob = prob * Random.Range(0.00f, 0.30f);
       }
-      prob = prob - (enemyCount/10);
+
+      prob = prob - (((float)enemyCount/4.5f) * 100);
       if(prob < 0.0f)
       {
         prob = 0.0f;
@@ -106,11 +124,12 @@ public class populateMe : MonoBehaviour
 
       Debug.Log(prob);
       bool finalChoice = (prob > Random.Range(-1, 100.0f));
+      Debug.Log(finalChoice);
 
       prevEnemy = null;
       prevObstacle = false;
 
-      if(!finalChoice)
+      if(finalChoice == true)
       {
         enemyCount = enemyCount + 1;
         return enemy;
@@ -120,20 +139,20 @@ public class populateMe : MonoBehaviour
 
     private Vector2[,] generateGrid(float x, float y, float floorZ)
     {
-      Vector2[,] toRet = new Vector2[5, 5];
+      Vector2[,] toRet = new Vector2[gridSectionsPerRow, gridSectionsPerRow];
 
       Vector2 startPoint = new Vector2(floorZ + (-x / 2), floorZ + (y / 2));
 
-      float stepX = (x / 5);
-      float stepY = (y / 5);
+      float stepX = (x / gridSectionsPerRow);
+      float stepY = (y / gridSectionsPerRow);
       float currX = startPoint.x + (stepX / 2);
       float currY = startPoint.y - (stepY / 2);
 
-      for(int i = 0; i < 5; i++)
+      for(int i = 0; i < gridSectionsPerRow; i++)
       {
         float tempX = currX;
 
-        for(int z = 0; z < 5; ++z)
+        for(int z = 0; z < gridSectionsPerRow; ++z)
         {
           toRet[i,z] = new Vector2(tempX, currY);
           tempX += stepX;
