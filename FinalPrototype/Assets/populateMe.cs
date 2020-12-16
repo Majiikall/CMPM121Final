@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class populateMe : MonoBehaviour
 {
     public GameObject levelLayout;
@@ -16,14 +17,12 @@ public class populateMe : MonoBehaviour
     private GameObject prevEnemy;
     private int enemyCount = 0;
 
-    [SerializeField]
-    [Range(5, 25)]
-    public int gridSectionsPerRow;
-
     private int currGridSize = 0;
 
+    private List<GameObject> objectsInScene = new List<GameObject>();
+
     // Start is called before the first frame update
-    void Start()
+    public void populateLevel(int gridSectionsPerRow)
     {
       currGridSize = gridSectionsPerRow * gridSectionsPerRow;
 
@@ -54,7 +53,7 @@ public class populateMe : MonoBehaviour
 
       obstacleTransform.localScale = newScale;
 
-      Vector2[,] grid = generateGrid(floorSize.localScale.x * 10, floorSize.localScale.z * 10, relativeLevelPos);
+      Vector2[,] grid = generateGrid(floorSize.localScale.x * 10, floorSize.localScale.z * 10, relativeLevelPos, gridSectionsPerRow);
 
       List<int> locations = new List<int>();
 
@@ -80,7 +79,7 @@ public class populateMe : MonoBehaviour
           obstacles = true;
         }
         count = count + 1;
-        Vector2 index = convertToCoord(currRan);
+        Vector2 index = convertToCoord(currRan, gridSectionsPerRow);
 
         prevObstacle = (instantObj == obstacle);
         if(instantObj == enemy)
@@ -90,12 +89,15 @@ public class populateMe : MonoBehaviour
 
         locations.Remove(currRan);
         Vector2 positionsNew = grid[(int)index.x, (int)index.y];
-        Instantiate(instantObj, new Vector3(positionsNew.x, 0, positionsNew.y), Quaternion.identity, gameObject.GetComponent<Transform>());
+        objectsInScene.Add(Instantiate(instantObj, new Vector3(positionsNew.x, 0, positionsNew.y), Quaternion.identity, gameObject.GetComponent<Transform>()));
         Debug.Log(instantObj);
       }
+
+      //Add in the pathfinding
+      // verifyPath();
     }
 
-    private Vector2 convertToCoord(int toConv)
+    private Vector2 convertToCoord(int toConv, int gridSectionsPerRow)
     {
       float row = Mathf.Floor(toConv / gridSectionsPerRow);
       float column = toConv - (row * gridSectionsPerRow);
@@ -137,7 +139,7 @@ public class populateMe : MonoBehaviour
       return obstacle;
     }
 
-    private Vector2[,] generateGrid(float x, float y, float floorZ)
+    private Vector2[,] generateGrid(float x, float y, float floorZ, int gridSectionsPerRow)
     {
       Vector2[,] toRet = new Vector2[gridSectionsPerRow, gridSectionsPerRow];
 
@@ -162,9 +164,8 @@ public class populateMe : MonoBehaviour
       return toRet;
     }
 
-    // Update is called once per frame
-    void Update()
+    public List<GameObject> returnSceneObjs()
     {
-
+      return this.objectsInScene;
     }
 }
