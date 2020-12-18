@@ -22,23 +22,18 @@ public class populateMe : MonoBehaviour
     private List<GameObject> objectsInScene = new List<GameObject>();
 
     // Start is called before the first frame update
-    public void populateLevel(int gridSectionsPerRow)
+    public void populateLevel(int gridSectionsPerRow, float relativeLevelPos)
     {
       currGridSize = gridSectionsPerRow * gridSectionsPerRow;
 
       Component[] features;
       features = levelLayout.GetComponentsInChildren<Transform>();
 
-      float relativeLevelPos = 0.0f;
       foreach(Transform x in features)
       {
         if(x.name != "baseLevel")
         {
           wallLocations.Add(x);
-        }
-        else
-        {
-          relativeLevelPos = x.localPosition.z;
         }
       }
 
@@ -90,7 +85,6 @@ public class populateMe : MonoBehaviour
         locations.Remove(currRan);
         Vector2 positionsNew = grid[(int)index.x, (int)index.y];
         objectsInScene.Add(Instantiate(instantObj, new Vector3(positionsNew.x, 0, positionsNew.y), Quaternion.identity, gameObject.GetComponent<Transform>()));
-        Debug.Log(instantObj);
       }
 
       //Add in the pathfinding
@@ -124,9 +118,7 @@ public class populateMe : MonoBehaviour
         prob = 0.0f;
       }
 
-      Debug.Log(prob);
       bool finalChoice = (prob > Random.Range(-1, 100.0f));
-      Debug.Log(finalChoice);
 
       prevEnemy = null;
       prevObstacle = false;
@@ -143,7 +135,7 @@ public class populateMe : MonoBehaviour
     {
       Vector2[,] toRet = new Vector2[gridSectionsPerRow, gridSectionsPerRow];
 
-      Vector2 startPoint = new Vector2(floorZ + (-x / 2), floorZ + (y / 2));
+      Vector2 startPoint = new Vector2((-x / 2), floorZ + (y / 2));
 
       float stepX = (x / gridSectionsPerRow);
       float stepY = (y / gridSectionsPerRow);

@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 7616589}
   - component: {fileID: 7616588}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -363,12 +363,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 67821527}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &463600056 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4271373523020758689, guid: c2c533600ca924d979dc5e6a0e786675,
-    type: 3}
-  m_PrefabInstance: {fileID: 4271373523396118297}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &895356860 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6659028612903936725, guid: 3367c1bfdea32451795db587b1c10db0,
@@ -411,7 +405,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridSectionsPerRow: 5
-  level: {fileID: 463600056}
+  levelPrefab: {fileID: 4271373523020758689, guid: c2c533600ca924d979dc5e6a0e786675,
+    type: 3}
 --- !u!4 &1511255558
 Transform:
   m_ObjectHideFlags: 0
@@ -749,6 +744,11 @@ PrefabInstance:
     - target: {fileID: 4271373523020758691, guid: c2c533600ca924d979dc5e6a0e786675,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131344646327831206, guid: c2c533600ca924d979dc5e6a0e786675,
+        type: 3}
+      propertyPath: m_CollisionDetection
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
